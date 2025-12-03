@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import employee from '../router/employee_route.js';
-
+import service from '../router/services_route.js';
 
 dotenv.config();
 
@@ -28,3 +28,4 @@ async function connectDb() {
 connectDb();
 
 app.use('/employees' , employee);
+app.use('/services' , service);
