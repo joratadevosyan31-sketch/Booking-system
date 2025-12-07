@@ -1,5 +1,5 @@
 import { Service } from '../model/service.js';
-import { Employee } from './../model/employee.js';
+import { Employee } from '../model/employee.js';
 import { EmployeeAbs } from "../interface/employee_abs.js";
 import { Request, Response } from 'express';
 import { Salon } from '../model/salon.js';

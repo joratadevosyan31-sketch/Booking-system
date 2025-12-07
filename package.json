@@ -7,7 +7,12 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "format": "pnpm exec prettier --write 'src/**/*.ts' 'controllers/**/*.ts' 'models/**/*.ts' 'routers/**/*.ts' 'middleware/**/*.ts' 'interfaces/**/*.ts' || true",
-    "format:check": "pnpm exec prettier --check 'src/**/*.ts' 'controllers/**/*.ts' 'middleware/**/*.ts' 'models/**/*.ts' 'routers/**/*.ts' 'util/**/*.ts'"
+    "seed": "node --loader ts-node/esm src/seeds/salon.seed.ts && node --loader ts-node/esm src/seeds/service.seed.ts && node --loader ts-node/esm src/seeds/employee.seed.ts && node --loader ts-node/esm src/seeds/costumer.seed.ts && node --loader ts-node/esm src/seeds/booking.seed.ts",
+    "seed:salon": "node --loader ts-node/esm src/seeds/salon.seed.ts",
+    "seed:service": "node --loader ts-node/esm src/seeds/service.seed.ts",
+    "seed:employee": "node --loader ts-node/esm src/seeds/employee.seed.ts",
+    "seed:customer": "node --loader ts-node/esm src/seeds/costumer.seed.ts",
+    "seed:booking": "node --loader ts-node/esm src/seeds/booking.seed.ts"
   },
   "dependencies": {
     "axios": "^1.11.0",
@@ -30,5 +35,18 @@
     "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
-  }
+  },
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joratadevosyan31-sketch/Booking-system.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joratadevosyan31-sketch/Booking-system/issues"
+  },
+  "homepage": "https://github.com/joratadevosyan31-sketch/Booking-system#readme"
 }

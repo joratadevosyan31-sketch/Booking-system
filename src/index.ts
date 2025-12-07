@@ -2,30 +2,46 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import employee from '../router/employee_route.js';
-import service from '../router/services_route.js';
+
+import employee from './router/employee_route.js';
+import service from './router/services_route.js';
+import customer from './router/customer_route.js';
+import booking from './router/booking_route.js';
+import daySchedule from './router/day_route.js';
+import salon from './router/salon_route.js';
+
 
 dotenv.config();
 
 const app = express();
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(express.json());
 
+
 async function connectDb() {
     try {
-        await mongoose.connect('mongodb://localhost:27017/booking');
+        await mongoose.connect('mongodb://localhost:27017/bookingService');
         console.log('Db was connected');
-        app.listen(PORT , () => {
-            console.log(`app is listend on url http://localhost:${PORT}`)
-        })
-        
-    }catch (e) {
-        console.error('Db failed')
+        app.listen(PORT, () => {
+            console.log(`App is listening on http://localhost:${PORT}`);
+        });
+    } catch (e) {
+        console.error('Db failed', e);
     }
 }
+
 connectDb();
 
-app.use('/employees' , employee);
-app.use('/services' , service);
+
+app.use('/employees', employee);
+app.use('/services', service);
+app.use('/customers', customer);
+app.use('/bookings', booking);
+app.use('/day-schedules', daySchedule);
+app.use('/salon', salon); 
+
+app.get('/', (req, res) => {
+    res.send('Booking Service API is running');
+});

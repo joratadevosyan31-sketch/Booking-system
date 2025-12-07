@@ -1,0 +1,17 @@
+import mongoose from "mongoose";
+
+const bookingSchema = new mongoose.Schema({
+  service: { type: mongoose.Schema.Types.ObjectId, ref: "Service", required: true },
+  subService: { type: mongoose.Schema.Types.ObjectId, ref: "SubService", required: true },
+  employee: { type: mongoose.Schema.Types.ObjectId, ref: "Employee", required: true },
+  customer: { type: mongoose.Schema.Types.ObjectId, ref: "Customer", required: true },
+  date: { type: Date, required: true },
+  startTime: { type: String, required: true },
+  endTime: { type: String, required: true },
+  status: { type: String, enum: ["pending", "completed", "canceled"], default: "pending" }
+});
+
+// Prevent duplicate booking for same customer, subService, date, and startTime
+bookingSchema.index({ customer: 1, subService: 1, date: 1, startTime: 1 }, { unique: true });
+
+export const Booking = mongoose.model("Booking", bookingSchema, "bookings");
