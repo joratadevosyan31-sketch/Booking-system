@@ -3,7 +3,6 @@ import { Employee } from '../model/employee.js';
 import { EmployeeAbs } from "../interface/employee_abs.js";
 import { Request, Response } from 'express';
 import { Salon } from '../model/salon.js';
-import { log } from 'console';
 
 
 class ControllEmployee extends EmployeeAbs {
@@ -60,7 +59,7 @@ class ControllEmployee extends EmployeeAbs {
     async GetSpecificEmployee(req: Request, res: Response): Promise<void> {
         try {
             const { employeeId } = req.params;
-            
+
             if (!employeeId) {
                 res.status(400).json({ success: false, message: "Employee ID is required" });
                 return;

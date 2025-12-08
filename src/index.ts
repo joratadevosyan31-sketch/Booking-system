@@ -40,7 +40,7 @@ app.use('/services', service);
 app.use('/customers', customer);
 app.use('/bookings', booking);
 app.use('/day-schedules', daySchedule);
-app.use('/salon', salon); 
+app.use('/salon', salon);
 
 app.get('/', (req, res) => {
     res.send('Booking Service API is running');

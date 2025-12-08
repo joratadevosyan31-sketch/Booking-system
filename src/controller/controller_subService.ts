@@ -2,9 +2,10 @@ import { Service } from "../model/service.js";
 import { SubService } from "../model/subService.js";
 import { Request, Response } from "express";
 import { ServiceAbs } from "../interface/Service_abs.js";
+import { log } from "console";
 
 
-class ServiceController extends ServiceAbs{
+class ServiceController extends ServiceAbs {
 
     async getServices(req: Request, res: Response): Promise<void> {
         try {
