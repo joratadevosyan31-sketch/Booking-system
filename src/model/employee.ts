@@ -2,7 +2,10 @@ import mongoose from "mongoose";
 
 const employeeSchema = new mongoose.Schema({
   name: { type: String, required: true },
+  profession: { type: String, required: true },
+  img: { type: String, required: true },
   services: [{ type: mongoose.Schema.Types.ObjectId, ref: "Service" }],
+  subServices: [{ type: mongoose.Schema.Types.ObjectId, ref: "SubService" }],
   workStart: { type: String, required: true },
   workEnd: { type: String, required: true },
   mainBreakStart: { type: String, default: null },

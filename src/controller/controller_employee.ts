@@ -8,7 +8,7 @@ import { Salon } from '../model/salon.js';
 class ControllEmployee extends EmployeeAbs {
     async GetEmployees(req: Request, res: Response): Promise<void> {
         try {
-            const employees = await Employee.find();
+            const employees = await Employee.find().populate("services").populate("subServices");
             res.status(200).json({
                 employees
             })
@@ -38,7 +38,7 @@ class ControllEmployee extends EmployeeAbs {
                 return;
             }
 
-            const employees = await Employee.find({ services: service._id }).populate("services");
+            const employees = await Employee.find({ services: service._id }).populate("services").populate("subServices");
 
             if (employees.length === 0) {
                 res.status(404).json({ success: false, message: "No employees found for this service" });
@@ -65,7 +65,7 @@ class ControllEmployee extends EmployeeAbs {
                 return;
             }
 
-            const employee = await Employee.findById(employeeId).populate("services");
+            const employee = await Employee.findById(employeeId).populate("services").populate("subServices");
 
             if (!employee) {
                 res.status(404).json({ success: false, message: "Employee not found" });
@@ -84,7 +84,10 @@ class ControllEmployee extends EmployeeAbs {
         try {
             const {
                 name,
+                profession,
+                img,
                 services,
+                subServices,
                 workStart,
                 workEnd,
                 mainBreakStart,
@@ -93,7 +96,7 @@ class ControllEmployee extends EmployeeAbs {
             } = req.body;
 
 
-            if (!name || !services || !workStart || !workEnd) {
+            if (!name || !profession || !img || !services || !workStart || !workEnd) {
                 res.status(400).json({ success: false, message: "Missing required fields" });
                 return;
             }
@@ -106,7 +109,10 @@ class ControllEmployee extends EmployeeAbs {
 
             const newEmployee = await Employee.create({
                 name,
+                profession,
+                img,
                 services,
+                subServices: subServices || [],
                 workStart,
                 workEnd,
                 mainBreakStart: mainBreakStart ?? salon.mainBreakStart,
@@ -130,7 +136,7 @@ class ControllEmployee extends EmployeeAbs {
 
     async UpdateEmployee(req: Request, res: Response): Promise<void> {
         try {
-            const { employeeId, name, services, workStart, workEnd, mainBreakStart, mainBreakEnd, defaultBreakBetweenServices } = req.body;
+            const { employeeId, name, profession, img, services, subServices, workStart, workEnd, mainBreakStart, mainBreakEnd, defaultBreakBetweenServices } = req.body;
 
             // 1️⃣ Validate employeeId
             if (!employeeId) {
@@ -141,7 +147,10 @@ class ControllEmployee extends EmployeeAbs {
             // 2️⃣ Build an object with fields to update
             const updateData: any = {};
             if (name) updateData.name = name;
+            if (profession) updateData.profession = profession;
+            if (img) updateData.img = img;
             if (services) updateData.services = services;
+            if (subServices !== undefined) updateData.subServices = subServices;
             if (workStart) updateData.workStart = workStart;
             if (workEnd) updateData.workEnd = workEnd;
             if (mainBreakStart !== undefined) updateData.mainBreakStart = mainBreakStart;
@@ -153,7 +162,7 @@ class ControllEmployee extends EmployeeAbs {
                 employeeId,
                 updateData,
                 { new: true } // return the updated document
-            ).populate("services");
+            ).populate("services").populate("subServices");
 
             if (!updatedEmployee) {
                 res.status(404).json({ success: false, message: "Employee not found" });
