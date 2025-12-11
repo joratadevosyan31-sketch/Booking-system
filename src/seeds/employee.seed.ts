@@ -20,12 +20,6 @@ async function seedEmployees() {
             return;
         }
 
-        const subServices = await SubService.find();
-        if (!subServices.length) {
-            console.log("No subservices found! Seed subservices first.");
-            return;
-        }
-
         const employees = [
             { name: "Alice Johnson", profession: "Senior Stylist", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop" },
             { name: "Bob Smith", profession: "Master Barber", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop" },
@@ -53,36 +47,26 @@ async function seedEmployees() {
             { name: "Zoe Brooks", profession: "Color Specialist", img: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=400&h=400&fit=crop" }
         ];
 
-        function getRandomServices(): mongoose.Types.ObjectId[] {
-            const shuffled = services.sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, Math.floor(Math.random() * 3) + 1).map((s: any) => s._id);
+        function pickOneService(): any {
+            return services[Math.floor(Math.random() * services.length)];
         }
 
-        function getRandomSubServices(selectedServices: mongoose.Types.ObjectId[]): mongoose.Types.ObjectId[] {
-            // Get subservices that belong to the selected services
-            const availableSubServices = subServices.filter((sub: any) => 
-                selectedServices.some(serviceId => 
-                    services.find((s: any) => s._id.equals(serviceId))?.subServices?.some(
-                        (subId: mongoose.Types.ObjectId) => subId.equals(sub._id)
-                    )
-                )
-            );
-            
-            if (availableSubServices.length === 0) return [];
-            
-            const shuffled = availableSubServices.sort(() => 0.5 - Math.random());
-            const count = Math.floor(Math.random() * Math.min(3, shuffled.length)) + 1;
-            return shuffled.slice(0, count).map((s: any) => s._id);
+        function pickSevenSubServices(service: any): any[] {
+            const all = service.subServices || [];
+            const shuffled = [...all].sort(() => Math.random() - 0.5);
+            return shuffled.slice(0, Math.min(7, all.length));
         }
 
         const employeesData = employees.map(emp => {
-            const selectedServices = getRandomServices();
+            const service = pickOneService();
+            const subservices = pickSevenSubServices(service);
+
             return {
                 name: emp.name,
                 profession: emp.profession,
                 img: emp.img,
-                services: selectedServices,
-                subServices: getRandomSubServices(selectedServices),
+                services: [service._id],
+                subServices: subservices.map((s: any) => s._id),
                 workStart: "09:00",
                 workEnd: "18:00",
                 mainBreakStart: "13:00",
@@ -96,6 +80,7 @@ async function seedEmployees() {
 
         await mongoose.disconnect();
         console.log("Database disconnected");
+
     } catch (error) {
         console.error("Error seeding employees:", error);
         process.exit(1);
