@@ -15,14 +15,12 @@ const Login = ({ setIsLoginOpen }) => {
     }
 
     const handleAuthSuccess = (user) => {
-        console.log("✅ User authenticated successfully:", user)
+        // console.log("User authenticated successfully:", user)
         setIsLoginOpen(false)
-        
-        // Store user session
+
         localStorage.setItem("user", JSON.stringify(user))
         localStorage.setItem("isAuthenticated", "true")
-        
-        // Optionally refresh or update app state
+
         window.location.reload()
     }
 
@@ -40,23 +38,22 @@ const Login = ({ setIsLoginOpen }) => {
                 <div className="w-[600px] flex flex-col items-center gap-6 border-[2px] border-gray p-6 rounded-[12px] bg-white">
                     <h2 className="text-[36px]">Paragon for users</h2>
 
-                    {formMode === "login" && 
-                        <LoginForm 
+                    {formMode === "login" &&
+                        <LoginForm
                             setFormMode={setFormMode}
                             setConfirmationResult={setConfirmationResult}
                             setPhoneNumber={setPhoneNumber}
                         />
                     }
-                    
-                    {formMode === "confirm" && 
-                        <ConfirmLogin 
+
+                    {formMode === "confirm" &&
+                        <ConfirmLogin
                             confirmationResult={confirmationResult}
                             phoneNumber={phoneNumber}
                             onSuccess={handleAuthSuccess}
                             onBack={handleBackToLogin}
                         />
                     }
-
                 </div>
                 <button
                     onClick={() => setIsLoginOpen(false)}

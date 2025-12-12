@@ -1,10 +1,10 @@
 import LoginMessage from "./LoginMessage";
 import { useState, useEffect } from "react";
-import { 
-  auth,
-  signInWithPhoneNumber, 
-  setupRecaptcha, 
-  clearRecaptcha 
+import {
+    auth,
+    signInWithPhoneNumber,
+    setupRecaptcha,
+    clearRecaptcha
 } from "../../../firebase";
 
 const LoginForm = ({ setFormMode, setConfirmationResult, setPhoneNumber: setParentPhoneNumber }) => {
@@ -12,7 +12,6 @@ const LoginForm = ({ setFormMode, setConfirmationResult, setPhoneNumber: setPare
     const [loading, setLoading] = useState(false);
     const [localPhoneNumber, setLocalPhoneNumber] = useState("+374 ");
 
-    // Initialize reCAPTCHA
     useEffect(() => {
         if (!document.getElementById("recaptcha-container")) {
             const container = document.createElement("div");
@@ -20,7 +19,7 @@ const LoginForm = ({ setFormMode, setConfirmationResult, setPhoneNumber: setPare
             container.style.display = "none";
             document.body.appendChild(container);
         }
-        
+
         return () => {
             clearRecaptcha();
         };
@@ -29,8 +28,7 @@ const LoginForm = ({ setFormMode, setConfirmationResult, setPhoneNumber: setPare
     const handlePhoneChange = (e) => {
         const value = e.target.value;
         setLocalPhoneNumber(value);
-        
-        // Auto-format Armenian numbers
+
         if (value.startsWith("+374") && value.length === 4) {
             setLocalPhoneNumber(value + " ");
         }
@@ -40,26 +38,23 @@ const LoginForm = ({ setFormMode, setConfirmationResult, setPhoneNumber: setPare
         e.preventDefault();
         setError("");
         setLoading(true);
-        
+
         let phone = localPhoneNumber.trim();
-        
+
         if (!phone || phone === "+374") {
             setError("Please enter a valid phone number");
             setLoading(false);
             return;
         }
 
-        // Ensure phone number starts with +
         if (!phone.startsWith('+')) {
             phone = '+' + phone.replace(/^\+/, '');
         }
 
-        // Remove all spaces for validation
         const cleanPhone = phone.replace(/\s/g, '');
-        
-        // Validate Armenian phone number format
+
         if (cleanPhone.startsWith('+374')) {
-            // Check if we have exactly 8 digits after +374
+
             const digitsAfterCode = cleanPhone.substring(4);
             if (digitsAfterCode.length !== 8 || !/^\d{8}$/.test(digitsAfterCode)) {
                 setError("Please enter a valid 8-digit Armenian number after +374");
@@ -71,31 +66,31 @@ const LoginForm = ({ setFormMode, setConfirmationResult, setPhoneNumber: setPare
         try {
             // Setup reCAPTCHA verifier
             const recaptchaVerifier = setupRecaptcha();
-            
+
             console.log("Sending SMS to:", cleanPhone);
-            
+
             // Send SMS verification code via Firebase
             const confirmation = await signInWithPhoneNumber(auth, cleanPhone, recaptchaVerifier);
-            
+
             console.log("SMS sent successfully!", confirmation);
-            
+
             // Store phone number in parent component
             if (setParentPhoneNumber) {
                 setParentPhoneNumber(phone);
             }
-            
+
             // Store confirmation result and switch to confirm mode
             setConfirmationResult(confirmation);
             setFormMode("confirm");
-            
+
             // Store phone number for display
             localStorage.setItem("tempPhoneNumber", phone);
-            
+
         } catch (err) {
             console.error("Firebase error:", err.code, err.message);
-            
+
             let errorMessage = "Failed to send verification code. Please try again.";
-            
+
             if (err.code) {
                 switch (err.code) {
                     case 'auth/invalid-phone-number':
@@ -122,7 +117,7 @@ const LoginForm = ({ setFormMode, setConfirmationResult, setPhoneNumber: setPare
             } else if (err.message) {
                 errorMessage = err.message;
             }
-            
+
             setError(errorMessage);
             clearRecaptcha();
         } finally {
@@ -135,21 +130,21 @@ const LoginForm = ({ setFormMode, setConfirmationResult, setPhoneNumber: setPare
             <p className="w-[400px] text-center text-[18px] text-gray-600">
                 Enter your phone number to receive a verification code via SMS
             </p>
-            
+
             {/* Hidden reCAPTCHA container */}
             <div id="recaptcha-container" style={{ display: 'none' }}></div>
-            
+
             <form
                 onSubmit={handleSubmit}
                 className="flex flex-col items-center gap-4"
             >
                 <div className="relative">
-                    <input 
-                        type="tel" 
+                    <input
+                        type="tel"
                         value={localPhoneNumber}
                         onChange={handlePhoneChange}
-                        name="phoneNumber" 
-                        placeholder="+374 XX XXXXXX" 
+                        name="phoneNumber"
+                        placeholder="+374 XX XXXXXX"
                         className="border-[2px] border-black rounded-[12px] text-[20px] py-3 px-5 w-[300px]"
                         disabled={loading}
                         autoComplete="tel"
@@ -159,9 +154,9 @@ const LoginForm = ({ setFormMode, setConfirmationResult, setPhoneNumber: setPare
                         Example: +374 99 123456
                     </div>
                 </div>
-                
+
                 <LoginMessage error={error} />
-                
+
                 <button
                     type="submit"
                     disabled={loading}
@@ -177,7 +172,7 @@ const LoginForm = ({ setFormMode, setConfirmationResult, setPhoneNumber: setPare
                         </span>
                     ) : "Send Verification Code"}
                 </button>
-                
+
                 <div className="text-sm text-gray-500 text-center mt-2">
                     Standard SMS rates may apply
                 </div>

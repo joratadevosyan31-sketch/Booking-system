@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
-import { 
-  getAuth, 
-  signInWithPhoneNumber, 
+import {
+  getAuth,
+  signInWithPhoneNumber,
   RecaptchaVerifier,
   signInWithCredential,
   PhoneAuthProvider
@@ -18,7 +18,7 @@ const firebaseConfig = {
   measurementId: "G-HDVS8WXDJX"
 };
 
-// Initialize Firebase
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
@@ -28,13 +28,12 @@ console.log(app);
 
 // Setup reCAPTCHA verifier for phone authentication
 const setupRecaptcha = (containerId = "recaptcha-container") => {
-  // Clear any existing reCAPTCHA
+
   clearRecaptcha();
-  
-  // Create new reCAPTCHA verifier
+
   const recaptchaVerifier = new RecaptchaVerifier(
-    auth, 
-    containerId, 
+    auth,
+    containerId,
     {
       size: 'invisible', // or 'normal' for visible widget
       callback: () => {
@@ -43,7 +42,7 @@ const setupRecaptcha = (containerId = "recaptcha-container") => {
       }
     }
   );
-  
+
   return recaptchaVerifier;
 };
 

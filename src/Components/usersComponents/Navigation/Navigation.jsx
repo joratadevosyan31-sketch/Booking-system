@@ -4,6 +4,7 @@ import Login from "../../../Modal/LoginModal/Login"
 const Navigation = () => {
 
     const [IsLoginOpen, setIsLoginOpen] = useState(false)
+    const [isLoged, setIsLoged] = useState(false)
 
     useEffect(() => {
         if (IsLoginOpen) {
@@ -16,6 +17,18 @@ const Navigation = () => {
             document.body.style.overflow = "auto"
         }
     }, [IsLoginOpen])
+
+    useEffect(() => {
+        const isAuth = localStorage.getItem("isAuthenticated")
+        const serc = localStorage.getItem("_grecaptcha")
+        if (isAuth && serc) {
+            setIsLoged(true)
+        }
+    }, [])
+
+    const handleSagnOut = () => {
+
+    }
 
     return (
         <>
@@ -34,19 +47,32 @@ const Navigation = () => {
                             </li>
                         </ul>
                         <div>
-                            <button
-                                onClick={() => setIsLoginOpen(true)}
-                                type="button"
-                                className="text-[24px] text-blue-700 font-semibold p-3 rounded-[25px]"
-                            >
-                                Sign up
-                            </button>
+                            {
+                                isLoged ? (
+                                    <button
+                                        type="button"
+                                        className="text-[24px] text-blue-700 font-semibold p-3 rounded-[25px]"
+                                    >
+                                        Sign out
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() => setIsLoginOpen(true)}
+                                        type="button"
+                                        className="text-[24px] text-blue-700 font-semibold p-3 rounded-[25px]"
+                                    >
+                                        Sign up
+                                    </button>
+                                )
+                            }
+
                         </div>
                     </div>
                 </div>
-            </nav>
+            </nav >
 
-            {IsLoginOpen && <Login setIsLoginOpen={setIsLoginOpen} />}
+            {IsLoginOpen && <Login setIsLoginOpen={setIsLoginOpen} />
+            }
         </>
 
     )

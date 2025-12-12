@@ -1,11 +1,24 @@
-import { use, useState } from "react"
+import { useEffect } from "react"
 import CalendarBox from "./Components/CalendarBox"
 import ChangeProfessional from "./Components/ChangeProfessional"
+import { useDispatch, useSelector } from "react-redux"
+import { fetchGetDayScheduleData } from "../../../../store/slice/DaySchedualeDataState/DaySchedulDataApi"
 
 
 const TimeSlots = () => {
 
-    const [selected, setSelected] = useState(null)
+    const dispatch = useDispatch()
+
+    const { bookingData } = useSelector(state => state.bookingData)
+    const { dayScheduleData } = useSelector((state) => state.dayScheduleData)
+
+    useEffect(() => {
+        if (!bookingData || bookingData.length === 0) {
+            dispatch(fetchGetDayScheduleData())
+        }
+    }, [dispatch])
+
+    console.log(dayScheduleData);
 
     return (
         <div>

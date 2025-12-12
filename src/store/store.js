@@ -5,6 +5,7 @@ import { salonDataReducer } from "./slice/SalonDataState/SalonDataSlice";
 import { bookingDataReducer } from "./slice/BookingDataState/BookingDataSlice";
 import { customerDataReducer } from "./slice/CustomersDataState/CustomersDataSlice";
 import { authDataReducer } from "./slice/AuthDataState/AuthDataSlice";
+import { dayScheduleDataReducer } from "./slice/DaySchedualeDataState/DayScheduleDataSlice";
 
 export const store = configureStore({
     reducer: {
@@ -14,5 +15,6 @@ export const store = configureStore({
         bookingData: bookingDataReducer,
         customerData: customerDataReducer,
         authData: authDataReducer,
+        dayScheduleData: dayScheduleDataReducer,
     }
 })

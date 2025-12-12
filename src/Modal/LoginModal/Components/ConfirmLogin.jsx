@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { verifySMSCode } from "../../../firebase";
+import { useDispatch } from "react-redux";
 
 const ConfirmLogin = ({ confirmationResult, phoneNumber, onSuccess, onBack }) => {
+
     const [code, setCode] = useState(["", "", "", "", "", ""]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -9,20 +11,17 @@ const ConfirmLogin = ({ confirmationResult, phoneNumber, onSuccess, onBack }) =>
     const [resendTimer, setResendTimer] = useState(60);
     const inputRefs = useRef([]);
 
-    // Focus first input on mount
     useEffect(() => {
         if (inputRefs.current[0]) {
             inputRefs.current[0].focus();
         }
-        
-        // Get stored phone number if not provided
+
         const storedPhone = localStorage.getItem("tempPhoneNumber");
         if (!phoneNumber && storedPhone) {
             phoneNumber = storedPhone;
         }
     }, []);
 
-    // Resend timer effect
     useEffect(() => {
         let timer;
         if (resendDisabled && resendTimer > 0) {
@@ -48,12 +47,10 @@ const ConfirmLogin = ({ confirmationResult, phoneNumber, onSuccess, onBack }) =>
             newCode[index] = value;
             setCode(newCode);
 
-            // Auto-focus next input when a digit is entered
             if (value && index < 5) {
                 inputRefs.current[index + 1]?.focus();
             }
 
-            // Auto-submit when last digit is entered
             if (index === 5 && value) {
                 handleSubmit();
             }
@@ -68,7 +65,6 @@ const ConfirmLogin = ({ confirmationResult, phoneNumber, onSuccess, onBack }) =>
             inputRefs.current[index - 1]?.focus();
         }
 
-        // Handle arrow keys
         if (e.key === "ArrowLeft" && index > 0) {
             inputRefs.current[index - 1]?.focus();
         }
@@ -83,7 +79,7 @@ const ConfirmLogin = ({ confirmationResult, phoneNumber, onSuccess, onBack }) =>
         if (/^\d{6}$/.test(pasteData)) {
             const newCode = pasteData.split("");
             setCode(newCode);
-            
+
             setTimeout(() => {
                 inputRefs.current[5]?.focus();
             }, 0);
@@ -103,27 +99,24 @@ const ConfirmLogin = ({ confirmationResult, phoneNumber, onSuccess, onBack }) =>
         setError("");
 
         try {
-            // Verify the SMS code with Firebase
             if (!confirmationResult) {
                 throw new Error("Verification session expired. Please try again.");
             }
 
             const user = await verifySMSCode(confirmationResult, verificationCode);
-            
-            console.log("✅ User authenticated successfully:", user);
-            
-            // Store user session
+
+            console.log("User authenticated successfully:", user);
+
+
             localStorage.setItem("user", JSON.stringify(user));
             localStorage.setItem("isAuthenticated", "true");
             localStorage.removeItem("tempPhoneNumber"); // Clean up temp data
-            
-            // Call success callback
+
             onSuccess(user);
-            
+
         } catch (err) {
             console.error("Verification error:", err);
-            
-            // Handle Firebase errors
+
             if (err.code) {
                 switch (err.code) {
                     case 'auth/invalid-verification-code':
@@ -141,8 +134,7 @@ const ConfirmLogin = ({ confirmationResult, phoneNumber, onSuccess, onBack }) =>
             } else {
                 setError(err.message || "Verification failed. Please try again.");
             }
-            
-            // Clear code on error
+
             setCode(["", "", "", "", "", ""]);
             setTimeout(() => {
                 inputRefs.current[0]?.focus();
@@ -155,11 +147,9 @@ const ConfirmLogin = ({ confirmationResult, phoneNumber, onSuccess, onBack }) =>
     const handleResendCode = async () => {
         setResendDisabled(true);
         setResendTimer(60);
-        
-        // In a real app, you would call your resend API or Firebase function
+
         console.log("Resend requested for:", phoneNumber);
-        
-        // For now, just show an alert
+
         alert(`A new verification code has been sent to ${phoneNumber}`);
     };
 
@@ -231,12 +221,12 @@ const ConfirmLogin = ({ confirmationResult, phoneNumber, onSuccess, onBack }) =>
                     className="text-blue-600 hover:text-blue-800 disabled:text-gray-400 
                              disabled:cursor-not-allowed font-medium"
                 >
-                    {resendDisabled 
-                        ? `Resend code in ${resendTimer}s` 
+                    {resendDisabled
+                        ? `Resend code in ${resendTimer}s`
                         : "Resend code"
                     }
                 </button>
-                
+
                 <div className="pt-4 border-t border-gray-200">
                     <button
                         onClick={onBack}

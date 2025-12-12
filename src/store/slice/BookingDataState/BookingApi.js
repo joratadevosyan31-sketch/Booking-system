@@ -18,7 +18,6 @@ export const loadBookingFromLocalStorage = () => {
 };
 
 
-
 export const saveBookingToLocalStorage = (state) => {
     try {
         localStorage.setItem('bookingData', JSON.stringify(state));
@@ -27,7 +26,6 @@ export const saveBookingToLocalStorage = (state) => {
     }
 };
 
-
 export const clearBookingFromLocalStorage = () => {
     try {
         localStorage.removeItem('bookingData');
@@ -35,7 +33,6 @@ export const clearBookingFromLocalStorage = () => {
         console.error('Error clearing localStorage:', err);
     }
 };
-
 
 export const updateBookingInLocalStorage = (newData) => {
     try {
