@@ -1,41 +1,53 @@
 {
-  "name": "adminproject",
-  "private": true,
-  "version": "0.0.0",
+  "name": "mobix",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "dev": "nodemon --watch ./ --ext ts,json --ignore node_modules --exec \"node --loader ts-node/esm\" src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "format": "pnpm exec prettier --write 'src/**/*.ts' 'controllers/**/*.ts' 'models/**/*.ts' 'routers/**/*.ts' 'middleware/**/*.ts' 'interfaces/**/*.ts' || true",
+    "seed": "node --loader ts-node/esm src/seeds/salon.seed.ts && node --loader ts-node/esm src/seeds/service.seed.ts && node --loader ts-node/esm src/seeds/employee.seed.ts && node --loader ts-node/esm src/seeds/costumer.seed.ts && node --loader ts-node/esm src/seeds/booking.seed.ts",
+    "seed:salon": "node --loader ts-node/esm src/seeds/salon.seed.ts",
+    "seed:service": "node --loader ts-node/esm src/seeds/service.seed.ts",
+    "seed:employee": "node --loader ts-node/esm src/seeds/employee.seed.ts",
+    "seed:customer": "node --loader ts-node/esm src/seeds/costumer.seed.ts",
+    "seed:booking": "node --loader ts-node/esm src/seeds/booking.seed.ts"
   },
   "dependencies": {
-    "@reduxjs/toolkit": "^2.11.1",
-    "antd": "^6.0.0",
-    "axios": "^1.13.2",
-    "firebase": "^12.6.0",
-    "jsonwebtoken": "^9.0.3",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "react-redux": "^9.2.0",
-    "react-router": "^7.9.6",
-    "react-router-dom": "^7.9.6",
-    "react-slick": "^0.31.0",
-    "sass": "^1.94.2"
+    "axios": "^1.11.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "firebase-admin": "^13.6.0",
+    "google-auth-library": "^10.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.17.1",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
-    "@types/react": "^19.2.5",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
-    "autoprefixer": "^10.4.22",
-    "eslint": "^9.39.1",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.24",
-    "globals": "^16.5.0",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.18",
-    "vite": "^7.2.4"
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.3.0",
+    "nodemon": "^3.1.10",
+    "prettier": "^3.6.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
   },
-  "proxy": "http://localhost:4000"
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joratadevosyan31-sketch/Booking-system.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joratadevosyan31-sketch/Booking-system/issues"
+  },
+  "homepage": "https://github.com/joratadevosyan31-sketch/Booking-system#readme"
 }
