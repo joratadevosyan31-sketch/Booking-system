@@ -1,25 +1,41 @@
+import jwt from "jsonwebtoken";
 import admin from "../../firebaseAdmin.js";
 import { Request, Response, NextFunction } from "express";
 
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
+
+    console.log("Full Header:", req.headers.authorization);
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        res.status(401).json({
+            success: false,
+            message: "Authorization token missing"
+        });
+        return;
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    console.log(authHeader);
+
     try {
-        const authHeader = req.headers.authorization;
-
-        if (!authHeader) {
-            return res.status(401).json({ message: "No token provided" });
+        if (!process.env.JWT_SECRET) {
+            throw new Error("JWT_SECRET is not defined");
         }
 
-        const token = authHeader.split("Bearer ")[1];
-        if (!token) {
-            return res.status(401).json({ message: "Invalid token format" });
-        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        const decodedToken = await admin.auth().verifyIdToken(token);
+        // @ts-ignore (կամ ստեղծիր custom Request type)
+        req.user = decoded;
 
-        (req as any).user = decodedToken;
         next();
-    } catch (err) {
-        console.error(err);
-        return res.status(401).json({ message: "Unauthorized", error: (err as any)?.message });
+    } catch {
+        res.status(401).json({
+            success: false,
+            message: "Invalid or expired token"
+        });
+
     }
 };
+
