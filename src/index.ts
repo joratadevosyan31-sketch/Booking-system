@@ -11,6 +11,7 @@ import booking from './router/booking_route.js';
 import salon from './router/salon_route.js';
 import availableSlots from './router/availableSlots_route.js';
 import auth from './router/auth_route.js';
+import { updateFinishedBookings } from './jobs/updateFinishedBookings.js';
 
 
 dotenv.config();
@@ -26,6 +27,9 @@ async function connectDb() {
     try {
         await mongoose.connect('mongodb://localhost:27017/bookingService');
         console.log('Db was connected');
+
+        setInterval(updateFinishedBookings, 60 * 1000);
+
         app.listen(PORT, () => {
             console.log(`App is listening on http://localhost:${PORT}`);
         });
