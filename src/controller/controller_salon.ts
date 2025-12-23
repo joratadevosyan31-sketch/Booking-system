@@ -3,9 +3,9 @@ import { SalonAbs } from "../interface/salon_abs.js";
 import { Salon } from "../model/salon.js";
 import controller_booking from "./controller_booking.js";
 
- class SalonController extends SalonAbs {
-    
-    // always return the only salon
+class SalonController extends SalonAbs {
+
+
     async getSalon(req: Request, res: Response): Promise<void> {
         try {
             const salon = await Salon.findOne();
@@ -15,7 +15,7 @@ import controller_booking from "./controller_booking.js";
         }
     }
 
-    // update the only salon
+
     async updateSalon(req: Request, res: Response): Promise<void> {
         try {
             const updateData = req.body;

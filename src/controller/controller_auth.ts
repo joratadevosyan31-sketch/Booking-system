@@ -1,94 +1,3 @@
-                                                    
-// import { Request, Response } from "express";
-// import { Customer } from "../model/customer.js";
-// import jwt from "jsonwebtoken";
-
-// class AuthController {
-
-//     async verifyAndLogin(req: Request, res: Response): Promise<void> {
-//         try {
-//             const { phone, firebaseUid } = req.body;
-
-//             if (!phone || !firebaseUid) {
-//                 res.status(400).json({
-//                     success: false,
-//                     message: "Phone and Firebase UID required"
-//                 });
-//                 return;
-//             }
-
-//             let customer = await Customer.findOne({ phone });
-
-//             if (!customer) {
-//                 customer = new Customer({
-//                     phone,
-//                     firebaseUid,
-//                     verified: true,
-//                     lastLogin: new Date()
-//                 });
-//                 await customer.save();
-//             } else {
-//                 customer.firebaseUid = firebaseUid;
-//                 customer.verified = true;
-//                 customer.lastLogin = new Date();
-//                 await customer.save();
-//             }
-
-//             const token = jwt.sign(
-//                 {
-//                     userId: customer._id,
-//                     phone: customer.phone
-//                 },
-//                 process.env.JWT_SECRET || 'secret-key',
-//                 { expiresIn: '30d' }
-//             );
-
-//             res.status(200).json({
-//                 success: true,
-//                 token,
-//                 user: {
-//                     id: customer._id,
-//                     phone: customer.phone
-//                 }
-//             });
-
-//         } catch (error: any) {
-//             res.status(500).json({
-//                 success: false,
-//                 message: error.message
-//             });
-//         }
-//     }
-
-//     // Simple middleware to verify token
-//     verifyToken(req: Request, res: Response, next: Function): void {
-//         const token = req.headers.authorization?.split(' ')[1];
-
-//         if (!token) {
-//             res.status(401).json({
-//                 success: false,
-//                 message: "No token"
-//             });
-//             return;
-//         }
-
-//         try {
-//             const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret-key');
-//             // req.user = decoded;
-//             next();
-//         } catch {
-//             res.status(401).json({
-//                 success: false,
-//                 message: "Invalid token"
-//             });
-//         }
-//     }
-// }
-
-// export default new AuthController();
-
-
-
 import { Request, Response, NextFunction } from "express";
 import { Customer } from "../model/customer.js";
 import jwt from "jsonwebtoken";
@@ -151,7 +60,7 @@ class AuthController {
             const token = jwt.sign(
                 {
                     userId: customer._id,
-                    phone: customer.phone,
+                    role: customer.role,
                 },
                 process.env.JWT_SECRET,
                 { expiresIn: "30d" }
@@ -174,38 +83,6 @@ class AuthController {
         }
     }
 
-    // 🔐 JWT Middleware
-    verifyToken(req: Request, res: Response, next: NextFunction): void {
-        const authHeader = req.headers.authorization;
-
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            res.status(401).json({
-                success: false,
-                message: "Authorization token missing"
-            });
-            return;
-        }
-
-        const token = authHeader.split(" ")[1];
-
-        try {
-            if (!process.env.JWT_SECRET) {
-                throw new Error("JWT_SECRET is not defined");
-            }
-
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-            // @ts-ignore (կամ ստեղծիր custom Request type)
-            req.user = decoded;
-
-            next();
-        } catch {
-            res.status(401).json({
-                success: false,
-                message: "Invalid or expired token"
-            });
-        }
-    }
 
     async inValidateAndLogOut(req: Request, res: Response): Promise<void> {
         try {

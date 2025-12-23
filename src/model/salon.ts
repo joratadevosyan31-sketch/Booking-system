@@ -10,8 +10,8 @@ const salonSchema = new mongoose.Schema({
   defaultBreakBetweenServices: { type: Number, default: 5 }
 });
 
-// Ensure only one salon by unique name
+
 salonSchema.index({ name: 1 }, { unique: true });
 
-// Explicit collection name to avoid duplicates
+
 export const Salon = mongoose.model("Salon", salonSchema, "salon");

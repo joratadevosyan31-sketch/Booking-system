@@ -19,8 +19,6 @@ function calculateEndTime(startTime: string, duration: number): string {
 
 
 class BookingController extends BookingAbs {
-
-
     async getBookings(req: Request, res: Response): Promise<void> {
         try {
             const bookings = await Booking.find()
@@ -76,7 +74,6 @@ class BookingController extends BookingAbs {
                 service,
                 subServices,
                 employee,
-                // customer,
                 date,
                 startTime
             } = req.body;

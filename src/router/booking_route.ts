@@ -1,18 +1,19 @@
 import express from "express";
 import bookingController from "../controller/controller_booking.js";
 import { authenticate } from "../middleware/auth_middleware.js";
+import { authenticateAdmin } from "../middleware/adminAuth_middleware.js";
 
 const booking = express.Router();
 
-booking.get("/", bookingController.getBookings);
-booking.get("/one", bookingController.getBooking);
+booking.get("/", authenticateAdmin, bookingController.getBookings);
+booking.get("/one", authenticateAdmin, bookingController.getBooking);
 
 booking.post("/reservation", authenticate, bookingController.setBooking);
-booking.patch("/", authenticate, bookingController.updateBooking);
-booking.delete("/", authenticate, bookingController.deleteBooking);
+booking.patch("/", authenticateAdmin, bookingController.updateBooking);
+booking.delete("/", authenticateAdmin, bookingController.deleteBooking);
 
-booking.patch("/complete", authenticate, bookingController.completeBooking);
-booking.patch("/cancel", authenticate, bookingController.cancelBooking);
+booking.patch("/complete", authenticateAdmin, bookingController.completeBooking);
+booking.patch("/cancel", authenticateAdmin, bookingController.cancelBooking);
 
 export default booking;
 

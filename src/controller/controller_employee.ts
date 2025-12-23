@@ -138,13 +138,13 @@ class ControllEmployee extends EmployeeAbs {
         try {
             const { employeeId, name, profession, img, services, subServices, workStart, workEnd, mainBreakStart, mainBreakEnd, defaultBreakBetweenServices } = req.body;
 
-            // 1️⃣ Validate employeeId
+
             if (!employeeId) {
                 res.status(400).json({ success: false, message: "Employee ID is required" });
                 return;
             }
 
-            // 2️⃣ Build an object with fields to update
+
             const updateData: any = {};
             if (name) updateData.name = name;
             if (profession) updateData.profession = profession;
@@ -179,15 +179,15 @@ class ControllEmployee extends EmployeeAbs {
 
     async DelateEmployee(req: Request, res: Response): Promise<void> {
         try {
-            const { employeeId } = req.body; // reading from request body
+            const { employeeId } = req.body;
 
-            // 1️⃣ Validate employeeId
+
             if (!employeeId) {
                 res.status(400).json({ success: false, message: "Employee ID is required" });
                 return;
             }
 
-            // 2️⃣ Delete the employee
+
             const deletedEmployee = await Employee.findByIdAndDelete(employeeId);
 
             if (!deletedEmployee) {
@@ -195,7 +195,7 @@ class ControllEmployee extends EmployeeAbs {
                 return;
             }
 
-            // 3️⃣ Success
+
             res.status(200).json({
                 success: true,
                 message: "Employee deleted successfully",

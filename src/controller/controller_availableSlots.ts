@@ -2,20 +2,19 @@ import { Request, Response } from "express";
 import { Employee } from "../model/employee.js";
 import { Booking } from "../model/booking.js";
 
-// Utility to convert "HH:MM" to minutes
+
 const timeToMinutes = (time: string): number => {
     const [h, m] = time.split(":").map(Number);
     return h * 60 + m;
 };
 
-// Utility to convert minutes to "HH:MM"
+
 const minutesToTime = (minutes: number): string => {
     const h = String(Math.floor(minutes / 60)).padStart(2, "0");
     const m = String(minutes % 60).padStart(2, "0");
     return `${h}:${m}`;
 };
 
-// Generate available time slots
 const generateSlots = (
     startTime: string,
     endTime: string,
@@ -86,7 +85,6 @@ export const getAvailableSlots = async (req: Request, res: Response) => {
                 .select("time")
                 .exec();
 
-            // Normalize booked times to string "HH:MM" for generateSlots
             const bookedTimes = bookings.map((b) => {
                 const t = (b as any).time;
                 if (t instanceof Date) {
