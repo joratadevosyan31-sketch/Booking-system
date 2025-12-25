@@ -25,26 +25,27 @@ class ControllEmployee extends EmployeeAbs {
 
     async GetEmployeeByService(req: Request, res: Response): Promise<void> {
         try {
-            const { serviceName } = req.body;
+            const { serviceId } = req.params;
 
-            if (!serviceName) {
-                res.status(400).json({ success: false, message: "Service name is required" });
+            if (!serviceId) {
+                res.status(400).json({ success: false, message: "Service ID is required" });
                 return;
             }
 
-            const service = await Service.findOne({ name: serviceName });
+            const service = await Service.findById(serviceId);
             if (!service) {
                 res.status(404).json({ success: false, message: "Service not found" });
                 return;
             }
 
-            const employees = await Employee.find({ services: service._id }).populate("services").populate("subServices");
+            const employees = await Employee.find({ services: service._id })
+                .populate("services")
+                .populate("subServices");
 
             if (employees.length === 0) {
                 res.status(404).json({ success: false, message: "No employees found for this service" });
                 return;
             }
-
 
             res.status(200).json({
                 success: true,
@@ -179,7 +180,7 @@ class ControllEmployee extends EmployeeAbs {
 
     async DelateEmployee(req: Request, res: Response): Promise<void> {
         try {
-            const { employeeId } = req.body;
+            const { employeeId } = req.params;
 
 
             if (!employeeId) {
@@ -195,11 +196,14 @@ class ControllEmployee extends EmployeeAbs {
                 return;
             }
 
+            const employees = await Employee.find()
+                .populate("services")
+                .populate("subServices");
 
             res.status(200).json({
                 success: true,
                 message: "Employee deleted successfully",
-                employee: deletedEmployee
+                employees: employees
             });
 
         } catch (error: any) {

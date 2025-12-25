@@ -8,7 +8,7 @@ const employee = express.Router();
 employee.get('/', controller_employee.GetEmployees);
 employee.post('/', authenticateAdmin, controller_employee.SetEmployee);
 employee.get('/:employeeId', controller_employee.GetSpecificEmployee);
-employee.get('/service', controller_employee.GetEmployeeByService);
+employee.get('/service/:serviceId', controller_employee.GetEmployeeByService);
 employee.put('/:employeeId', authenticateAdmin, controller_employee.UpdateEmployee);
 employee.delete('/:employeeId', authenticateAdmin, controller_employee.DelateEmployee);
 

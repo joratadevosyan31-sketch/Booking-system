@@ -22,16 +22,40 @@ class BookingController extends BookingAbs {
     async getBookings(req: Request, res: Response): Promise<void> {
         try {
             const bookings = await Booking.find()
-                .populate("customer")
-                .populate("service")
-                .populate("subServices")
-                .populate("employee");
+                .populate({ path: "customer", strictPopulate: false })
+                .populate({ path: "service", strictPopulate: false })
+                .populate({ path: "subServices", strictPopulate: false })
+                .populate({ path: "employee", strictPopulate: false });
 
-            res.status(200).json({ success: true, bookings });
+            const sortedBookings = bookings.sort((a, b) => {
+
+                if (a.status === "pending" && b.status !== "pending") return -1;
+                if (a.status !== "pending" && b.status === "pending") return 1;
+
+                if (a.date > b.date) return -1;
+                if (a.date < b.date) return 1;
+
+                if (a.startTime > b.startTime) return -1;
+                if (a.startTime < b.startTime) return 1;
+
+                return 0;
+            });
+
+            res.status(200).json({
+                success: true,
+                bookings: sortedBookings
+            });
         } catch (error: any) {
-            res.status(500).json({ success: false, message: error.message });
+            console.error("GET BOOKINGS ERROR:", error);
+            res.status(500).json({
+                success: false,
+                message: error.message
+            });
         }
     }
+
+
+
 
 
     async getBooking(req: Request, res: Response): Promise<void> {
@@ -166,10 +190,9 @@ class BookingController extends BookingAbs {
                 employee,
                 customer,
                 date,
-                startTime
+                startTime,
+                status
             } = req.body;
-
-            // const customer = (req as any).user.uid;
 
             if (!bookingId) {
                 res.status(400).json({
@@ -179,51 +202,9 @@ class BookingController extends BookingAbs {
                 return;
             }
 
-            const updateData: any = {};
+            const booking = await Booking.findById(bookingId);
 
-            if (service) updateData.service = service;
-            if (employee) updateData.employee = employee;
-            if (customer) updateData.customer = customer;
-            if (date) updateData.date = date;
-            if (startTime) updateData.startTime = startTime;
-
-            if (subServices && Array.isArray(subServices)) {
-                updateData.subServices = subServices;
-
-                const subServiceDocs = await SubService.find({
-                    _id: { $in: subServices }
-                });
-
-                const employeeData = await Employee.findById(
-                    employee || updateData.employee
-                );
-
-                const breakBetween = employeeData?.defaultBreakBetweenServices || 5;
-
-                const servicesDuration = subServiceDocs.reduce(
-                    (sum, s) => sum + s.duration,
-                    0
-                );
-
-                const totalBreakTime = breakBetween * (subServiceDocs.length - 1);
-
-                updateData.endTime = calculateEndTime(
-                    startTime || updateData.startTime,
-                    servicesDuration + totalBreakTime
-                );
-            }
-
-            const updatedBooking = await Booking.findByIdAndUpdate(
-                bookingId,
-                updateData,
-                { new: true }
-            )
-                .populate("customer")
-                .populate("service")
-                .populate("subServices")
-                .populate("employee");
-
-            if (!updatedBooking) {
+            if (!booking) {
                 res.status(404).json({
                     success: false,
                     message: "Booking not found"
@@ -231,9 +212,71 @@ class BookingController extends BookingAbs {
                 return;
             }
 
+            if (service) booking.service = service;
+            if (employee) booking.employee = employee;
+            if (customer) booking.customer = customer;
+            if (date) booking.date = date;
+            if (startTime) booking.startTime = startTime;
+            if (status) booking.status = status;
+
+            if (Array.isArray(subServices)) {
+                booking.subServices = subServices;
+            }
+
+            const shouldRecalculateEndTime =
+                startTime ||
+                employee ||
+                Array.isArray(subServices);
+
+            if (shouldRecalculateEndTime) {
+                const finalEmployeeId = employee || booking.employee;
+                const finalSubServices = Array.isArray(subServices)
+                    ? subServices
+                    : booking.subServices;
+
+                const employeeData = await Employee.findById(finalEmployeeId);
+
+                if (!employeeData) {
+                    res.status(404).json({
+                        success: false,
+                        message: "Employee not found"
+                    });
+                    return;
+                }
+
+                const subServiceDocs = await SubService.find({
+                    _id: { $in: finalSubServices }
+                });
+
+                const breakBetween =
+                    employeeData.defaultBreakBetweenServices || 5;
+
+                const servicesDuration = subServiceDocs.reduce(
+                    (sum, s) => sum + s.duration,
+                    0
+                );
+
+                const totalBreakTime =
+                    breakBetween * Math.max(subServiceDocs.length - 1, 0);
+
+                booking.endTime = calculateEndTime(
+                    booking.startTime,
+                    servicesDuration + totalBreakTime
+                );
+            }
+
+            await booking.save();
+
+            const populatedBooking = await booking.populate([
+                "customer",
+                "service",
+                "subServices",
+                "employee"
+            ]);
+
             res.status(200).json({
                 success: true,
-                booking: updatedBooking
+                booking: populatedBooking
             });
 
         } catch (error: any) {
@@ -247,9 +290,9 @@ class BookingController extends BookingAbs {
 
     async deleteBooking(req: Request, res: Response): Promise<void> {
         try {
-            const { bookingId } = req.body;
+            const { id } = req.params;
 
-            if (!bookingId) {
+            if (!id) {
                 res.status(400).json({
                     success: false,
                     message: "Booking ID is required"
@@ -257,7 +300,7 @@ class BookingController extends BookingAbs {
                 return;
             }
 
-            const deletedBooking = await Booking.findByIdAndDelete(bookingId);
+            const deletedBooking = await Booking.findByIdAndDelete(id);
 
             if (!deletedBooking) {
                 res.status(404).json({
@@ -267,10 +310,32 @@ class BookingController extends BookingAbs {
                 return;
             }
 
+
+            const allBookings = await Booking.find()
+                .populate({ path: "customer", strictPopulate: false })
+                .populate({ path: "service", strictPopulate: false })
+                .populate({ path: "subServices", strictPopulate: false })
+                .populate({ path: "employee", strictPopulate: false });
+
+
+            const sortedBookings = allBookings.sort((a, b) => {
+
+                if (a.status === "pending" && b.status !== "pending") return -1;
+                if (a.status !== "pending" && b.status === "pending") return 1;
+
+                if (a.date > b.date) return -1;
+                if (a.date < b.date) return 1;
+
+                if (a.startTime > b.startTime) return -1;
+                if (a.startTime < b.startTime) return 1;
+
+                return 0;
+            });
+
             res.status(200).json({
                 success: true,
                 message: "Booking deleted",
-                booking: deletedBooking
+                bookings: sortedBookings
             });
 
         } catch (error: any) {

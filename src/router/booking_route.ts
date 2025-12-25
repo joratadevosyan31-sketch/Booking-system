@@ -10,7 +10,7 @@ booking.get("/one", authenticateAdmin, bookingController.getBooking);
 
 booking.post("/reservation", authenticate, bookingController.setBooking);
 booking.patch("/", authenticateAdmin, bookingController.updateBooking);
-booking.delete("/", authenticateAdmin, bookingController.deleteBooking);
+booking.delete("/:id", authenticateAdmin, bookingController.deleteBooking);
 
 booking.patch("/complete", authenticateAdmin, bookingController.completeBooking);
 booking.patch("/cancel", authenticateAdmin, bookingController.cancelBooking);
