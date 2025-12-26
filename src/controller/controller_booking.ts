@@ -274,9 +274,29 @@ class BookingController extends BookingAbs {
                 "employee"
             ]);
 
+
+            const bookings = await Booking.find()
+                .populate({ path: "customer", strictPopulate: false })
+                .populate({ path: "service", strictPopulate: false })
+                .populate({ path: "subServices", strictPopulate: false })
+                .populate({ path: "employee", strictPopulate: false });
+
+            const sortedBookings = bookings.sort((a, b) => {
+
+                if (a.status === "pending" && b.status !== "pending") return -1;
+                if (a.status !== "pending" && b.status === "pending") return 1;
+
+                if (a.date > b.date) return -1;
+                if (a.date < b.date) return 1;
+
+                if (a.startTime > b.startTime) return -1;
+                if (a.startTime < b.startTime) return 1;
+
+                return 0;
+            });
             res.status(200).json({
                 success: true,
-                booking: populatedBooking
+                bookings
             });
 
         } catch (error: any) {
@@ -427,6 +447,7 @@ class BookingController extends BookingAbs {
             });
         }
     }
+
 }
 
 export default new BookingController();

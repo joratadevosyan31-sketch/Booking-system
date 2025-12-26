@@ -11,7 +11,11 @@ const bookingSchema = new mongoose.Schema({
   startTime: { type: String, required: true },
   endTime: { type: String, required: true },
   status: { type: String, enum: ["pending", "completed", "canceled"], default: "pending" }
-});
+},
+  {
+    timestamps: true
+  }
+);
 
 
 bookingSchema.index({ customer: 1, date: 1, startTime: 1 }, { unique: true });

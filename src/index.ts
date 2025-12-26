@@ -12,6 +12,7 @@ import salon from './router/salon_route.js';
 import availableSlots from './router/availableSlots_route.js';
 import auth from './router/auth_route.js';
 import { updateFinishedBookings } from './jobs/updateFinishedBookings.js';
+import statistic from './router/statistic_route.js';
 
 
 dotenv.config();
@@ -49,6 +50,7 @@ app.use('/bookings', booking);
 app.use('/salon', salon);
 app.use('/slots', availableSlots)
 app.use('/auth', auth)
+app.use("/statistics", statistic)
 
 app.get('/', (req, res) => {
     res.send('Booking Service API is running');
