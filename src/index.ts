@@ -7,12 +7,12 @@ import employee from './router/employee_route.js';
 import service from './router/services_route.js';
 import customer from './router/customer_route.js';
 import booking from './router/booking_route.js';
-// import daySchedule from './router/day_route.js';
 import salon from './router/salon_route.js';
-import availableSlots from './router/availableSlots_route.js';
 import auth from './router/auth_route.js';
 import { updateFinishedBookings } from './jobs/updateFinishedBookings.js';
 import statistic from './router/statistic_route.js';
+import availability from './router/availability_route.js';
+
 
 
 dotenv.config();
@@ -48,7 +48,7 @@ app.use('/services', service);
 app.use('/customers', customer);
 app.use('/bookings', booking);
 app.use('/salon', salon);
-app.use('/slots', availableSlots)
+app.use('/availability', availability)
 app.use('/auth', auth)
 app.use("/statistics", statistic)
 
