@@ -20,7 +20,7 @@ class AuthController {
                 return;
             }
 
-            // 🔐 Verify Firebase token
+
             const decodedToken = await admin.auth().verifyIdToken(idToken);
 
             const firebaseUid = decodedToken.uid;
